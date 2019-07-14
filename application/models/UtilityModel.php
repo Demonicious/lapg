@@ -20,7 +20,7 @@
 		public function update() {
 			$url = 'http://data.fixer.io/api/latest';
 
-			$apikey = '814affe4b60e3663a7b980f21ce5d416';
+			$apikey = 'YOUR FIXER API KEY';
 			$baseCurrency = "EUR";
 			$format = "1";
 
