@@ -147,6 +147,55 @@ class User extends CI_Controller {
 			redirect($data['url']."user", "refresh");
 		}
 	}
+	public function send() {
+		$data = array();
+		$data["page_title"] = "LAPG - Send a Payment";
+		$data["page"] = "send_payment";
+		$data["url"] = base_url();
+		$isLoggedIn = $this->UtilityModel->isLoggedIn();
+		if($isLoggedIn) {
+			$sitePercentage = $this->PaymentsModel->getSetting("site_percentage");
+			$data["user"] = $this->PaymentsModel->getUserInformation($this->session->userdata("user_id"));
+			if($this->input->post("payment-xaddress-submission") != NULL) {
+				if($this->input->post("address") != NULL) {
+					if(strlen($this->input->post("address")) == 45) {
+						if($this->input->post("amount") != NULL) {
+							if(is_numeric($this->input->post("amount"))) {
+								$curr_amount = number_format($_POST['amount'], 1);
+								if(((number_format($sitePercentage, 2) / $curr_amount) / 100) <= $data["user"]["balance_held_in_currency"]) {
+									$data["send_payment"] = $this->PaymentsModel->sendToXAddress($this->session->userdata("user_id"), $this->input->post("address"), $curr_amount, $data['user']['currency']);
+								} else {
+									$data["send_payment"] = array();
+									$data["send_payment"]["status"] = "error";
+									$data["send_payment"]["error"] = "Insufficient Funds.";
+								}
+							} else {
+								$data["send_payment"] = array();
+								$data["send_payment"]["status"] = "error";
+								$data["send_payment"]["error"] = "Amount should be a Number";
+							}
+						} else {
+							$data["send_payment"] = array();
+							$data["send_payment"]["status"] = "error";
+							$data["send_payment"]["error"] = "Amount is Required";
+						}
+					} else {
+						$data["send_payment"] = array();
+						$data["send_payment"]["status"] = "error";
+						$data["send_payment"]["error"] = "Invalid XAddress Length";
+					}
+				} else {
+					$data["send_payment"] = array();
+					$data["send_payment"]["status"] = "error";
+					$data["send_payment"]["error"] = "Address is Required";	
+				}
+			}
+			$data['user'] = $this->PaymentsModel->getUserInformation($this->session->userdata("user_id"));
+			$this->load->view("view", $data);
+		} else {
+			redirect($data['url']."user", "refresh");
+		}
+	}
 	public function upgrade() {
 		$data = array();
 		$data["page_title"] = "LAPG - Upgrade To Merchant";

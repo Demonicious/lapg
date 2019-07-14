@@ -11,6 +11,16 @@
 				false;
 			}
 		}
+		public function convertFromOther($amount, $from) {
+			$query = $this->db->get_where("rates", array("currency" => $from));
+			$result = $query->result();
+			if(count($result) > 0) {
+				$row = $result[0];
+				return ($amount / $row->rate);
+			} else {
+				false;
+			}
+		}
 		public function logout() {
 			$this->session->unset_userdata("username");
 			$this->session->unset_userdata("email");
@@ -37,6 +47,47 @@
 			} else {
 				return false;
 			}
+		}
+		public function getSetting($s) {
+			$query = $this->db->get_where("settings", array("setting_name" => $s));
+			$result = $query->result();
+			if(count($result) > 0) {
+				$row = $result[0];
+				return $row->setting_value;
+			} else {
+				return "not found";
+			}
+		}
+		public function getBalance($uid) {
+			$query = $this->db->get_where("balance", array("user_id" => $uid));
+			$result = $query->result();
+			if(count($result) > 0) {
+				$row = $result[0];
+				return $row->balance_held;
+			}
+		}
+		public function sendToXAddress($uid, $address, $amount, $curr) {
+			$returnArray = array();
+			$amount_in_currency = $this->convertFromOther($amount, $curr);
+			$query = $this->db->get_where("users", array("unique_address" => $address));
+			$result = $query->result();
+			if(count($result) > 0) {
+				$row = $result[0];
+				$receiver = $row->id;
+				$this->db->where("user_id", $receiver);
+				$new_balance = $this->getBalance($receiver) + $amount_in_currency;
+				$this->db->update("balance", array("balance_held" => $new_balance));
+				$this->db->insert("transactions", array("id" => NULL, "user_id" => $uid, "sent_to" => $address, "amount" => $amount_in_currency, "timestamp" => time()));
+				$this->db->where("user_id", $uid);
+				$new_balance = ($this->getSetting("site_percentage") / $this->getBalance($uid)) * 100;
+				$this->db->update("balance", array("balance_held" => $this->getBalance($uid) - (($this->getSetting("site_percentage") / $amount_in_currency) / 100)));
+				$returnArray["status"] = "success";
+				$returnArray["error"] = "Payment Sent Successfully.";
+			} else {
+				$returnArray["status"] = "error";
+				$returnArray["error"] = "XAddress not Found.";
+			}
+			return $returnArray;
 		}
 		public function getAllTransactions($uid) {
 			$query = $this->db->get_where("transactions", array("user_id" => $uid));

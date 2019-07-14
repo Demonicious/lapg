@@ -41,9 +41,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			<p>Currently Logged in As: <?php echo $user["username"] ?><br><br>
 			<a href="<?php echo $url ?>user/change_address">Change Name</a> <a href="<?php echo $url ?>user/change_password">Change Password</a> <a href="<?php echo $url ?>user/logout">Logout</a><br><br>
 Your Balance is: <span style="text-decoration: underline;"><?php echo $user["balance_held_in_currency"] ?></span> <span style="text-transform: uppercase"><?php echo $user["currency"] ?></span><br><br>
-You can receive money through the following ways:-<br>
-	-> Someone sends you Money to your E-Mail Address: <?php echo $user["email"] ?><br>
-	-> You can receive money anonymously by your Unique Address: <?php echo $user["unique_address"] ?><br><br>
+You can receive money through the following ways:-<br><br>
+	<!-- Someone sends you Money to your E-Mail Address: <?php echo $user["email"] ?><br>-->
+	-> You can receive money by your Unique XAddress: <?php echo $user["unique_address"] ?><br><br>
 <a href="<?php echo $url ?>user/send">Send Money</a><br><br>
 Address Info:-<br><br>
 Address Line 1: <?php echo $user["address"]["line_1"] ?><br>
@@ -138,6 +138,19 @@ You need to have a Merchant Account for API Access<br><br>
 					<br>
 					<input class="input" type="hidden" name="merchant-info-change-submission" value="true" />
 					<input class="input" type="submit" value="Change Merchant Info" />
+				</form>
+			<br><a href="<?php echo $url ?>user">Back to Account Home</a>
+		<?php } ?>
+		<?php if($page == "send_payment") { ?>
+				Enter the Recepient's Information Below and Click the Respective Button.<br>
+				<?php if(isset($send_payment)) { echo $send_payment["error"]; } ?>
+				<form method="post" action="<?php echo $url ?>user/send">
+					<input class="input" type="text" name="address" id="address" placeholder="XAddress" />
+					<br>
+					<input class="input" type="text" name="amount" id="amount" placeholder="Amount (<?php echo strtoupper($user['currency']) ?>)" />
+					<br>
+					<input class="input" type="hidden" name="payment-xaddress-submission" value="true" />
+					<button type="submit" class="input">Send To XAddress</button>
 				</form>
 			<br><a href="<?php echo $url ?>user">Back to Account Home</a>
 		<?php } ?>
