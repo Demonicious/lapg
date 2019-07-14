@@ -13,7 +13,7 @@ Written in CodeIgniter 3.1.10 with more of a... Model Controller Approach rather
 ### Setting up the Database
 Theres a file called "lapg_db.sql" in the Repo. Import that into your Database and after doing so, Edit application/config/database.php with the Correct Database Credentials.
 
-### Setting Up the Fixed.io API
+### Setting Up the Fixer.io API
 Get an API Key from Fixer.io (its Free) and edit application/models/utilitymodel.php. Set $apikey = *Your Api Key* in the update() method.
 
 ### Current Progress
