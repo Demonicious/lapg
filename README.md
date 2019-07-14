@@ -19,4 +19,7 @@ Currently, I've only Implemented Data Retrieval from Database (CRUD lul)
 6.) Sending and Receiving Payments Through the 2 Methods as seen in the Image above (along with the API Invoices)<br/>
 7.) Write an API Documentation (Will barely be 2 Pages, at max)<br/><br/>
 
+### Details
+Written in CodeIgniter 3.1.10 with more of a... Model Controller Approach rather than a Model View Controller Approach cause there's only 1 view, where everything happens and I didn't wanna bother creating good looking templates. And I couldn't find any Free ones online either. But Anyways Moving on..
+
 Well, Theres a lot to do. And this is just a Fun little Project I do in my free time. But I wanna finish this, Soon hopefully.
