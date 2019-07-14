@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class User extends CI_Controller {
 	public function index() {
 		$data = array();
-		$data["page_title"] = "LAPG - Index";
+		$data["page_title"] = "LAPG - Account Home";
 		$data["url"] = base_url();
 		$isLoggedIn = $this->UtilityModel->isLoggedIn();
 		if($this->input->post("login-submission") != NULL && !$isLoggedIn) {
@@ -28,9 +28,144 @@ class User extends CI_Controller {
 					$this->load->view("view", $data);
 			} else {
 				$data["page"] = "login";
-				$data["error_msg"] = "Fill in the Boxes Below.";
 				$this->load->view("view", $data);
 			}
+		}
+	}
+	public function transactions() {
+		$data = array();
+		$data["page_title"] = "LAPG - All Transactions";
+		$data["page"] = "transactions";
+		$data["url"] = base_url();
+		$isLoggedIn = $this->UtilityModel->isLoggedIn();
+		if($isLoggedIn) {
+			$data['user'] = $this->PaymentsModel->getUserInformation($this->session->userdata('user_id'));
+			$data['transactions'] = $this->PaymentsModel->getAllTransactions($this->session->userdata('user_id'));
+			$this->load->view("view", $data);
+		} else {
+			redirect($data['url']."user", "refresh");
+		}
+	}
+	public function change_merchant_info() {
+		$data = array();
+		$data["page_title"] = "LAPG - Change Merchant Info";
+		$data["page"] = "change_merchant_info";
+		$data["url"] = base_url();
+		$isLoggedIn = $this->UtilityModel->isLoggedIn();
+		if($isLoggedIn) {
+			if($this->input->post("merchant-info-change-submission") != NULL) {
+				if($this->input->post("merchant_name") != NULL &&  $this->input->post("merchant_description") != NULL) {
+					$data["merchant_info_change"] = $this->PaymentsModel->changeMerchantInfo($this->session->userdata("user_id"), array(
+						"name" => $this->input->post("merchant_name"),
+						"description" => $this->input->post("merchant_description"),
+					));
+				} else {
+					$data['merchant_info_change']["status"] = "error";
+					$data['merchant_info_change']["error"] = "All Fields are Required.";
+				}
+			}
+			$data['user'] = $this->PaymentsModel->getUserInformation($this->session->userdata("user_id"));
+			$this->load->view("view", $data);
+		} else {
+			redirect($data['url']."user", "refresh");
+		}
+	}
+	public function change_address() {
+		$data = array();
+		$data["page_title"] = "LAPG - Change Address";
+		$data["page"] = "change_address";
+		$data["url"] = base_url();
+		$isLoggedIn = $this->UtilityModel->isLoggedIn();
+		if($isLoggedIn) {
+			if($this->input->post("address-change-submission") != NULL) {
+				if($this->input->post("line_1") != NULL &&  $this->input->post("line_2") != NULL &&  $this->input->post("city") != NULL &&  $this->input->post("zipcode") != NULL &&  $this->input->post("state") != NULL &&  $this->input->post("country") != NULL && $this->input->post("name") != NULL) {
+					$data["address_change"] = $this->PaymentsModel->changeAddress($this->session->userdata("user_id"), array(
+						"name" => $this->input->post("name"),
+						"line_1" => $this->input->post("line_1"),
+						"line_2" => $this->input->post("line_2"),
+						"city" => $this->input->post("city"),
+						"zipcode" => $this->input->post("zipcode"),
+						"state" => $this->input->post("state"),
+						"country" => $this->input->post("country")
+					));
+				} else {
+					$data['address_change']["status"] = "error";
+					$data['address_change']["error"] = "All Fields are Required.";
+				}
+			}
+			$data['user'] = $this->PaymentsModel->getUserInformation($this->session->userdata("user_id"));
+			$this->load->view("view", $data);
+		} else {
+			redirect($data['url']."user", "refresh");
+		}
+	}
+	public function change_password() {
+		$data = array();
+		$data["page_title"] = "LAPG - Change Password";
+		$data["page"] = "change_password";
+		$data["url"] = base_url();
+		$isLoggedIn = $this->UtilityModel->isLoggedIn();
+		if($isLoggedIn) {
+			if($this->input->post("password-change-submission") != NULL) {
+				if($this->input->post("new_password") != NULL &&  $this->input->post("password_confirmation") != NULL && $this->input->post("curr_password") != NULL) {
+					if($this->PaymentsModel->matchPassword($this->session->userdata("user_id"), $this->input->post("curr_password"))) {
+						if($this->input->post("new_password") == $this->input->post("password_confirmation")) {
+							$data['password_change'] = array();
+							$data["password_change"] = $this->PaymentsModel->changePassword($this->session->userdata('user_id'), $this->input->post("new_password"));
+						} else {
+							$data["password_change"] = array();
+							$data["password_change"]["status"] = "error";
+							$data["password_change"]["error"] = "Invalid Password Confirmation.";
+						}
+					} else {
+						$data["password_change"] = array();
+						$data["password_change"]["status"] = "error";
+						$data["password_change"]["error"] = "Your Current Password is Invalid.";
+					}
+					
+				} else {
+					$data['password_change']["status"] = "error";
+					$data['password_change']["error"] = "All Fields are Required.";
+				}
+			}
+			$data['user'] = $this->PaymentsModel->getUserInformation($this->session->userdata("user_id"));
+			$this->load->view("view", $data);
+		} else {
+			redirect($data['url']."user", "refresh");
+		}
+	}
+	public function new_key() {
+		$data = array();
+		$data["page_title"] = "LAPG - Account Home";
+		$data["page"] = "logged_in";
+		$data["url"] = base_url();
+		$isLoggedIn = $this->UtilityModel->isLoggedIn();
+		if($isLoggedIn) {
+			$this->PaymentsModel->generateNewKey($this->session->userdata('user_id'));
+			redirect($data['url']."user", "refresh");
+		} else {
+			redirect($data['url']."user", "refresh");
+		}
+	}
+	public function upgrade() {
+		$data = array();
+		$data["page_title"] = "LAPG - Upgrade To Merchant";
+		$data["page"] = "merchant_upgrade";
+		$data["url"] = base_url();
+		$isLoggedIn = $this->UtilityModel->isLoggedIn();
+		if($isLoggedIn) {
+			if($this->input->post("upgrade-submission") != NULL) {
+				if($this->input->post("merchant_name") != NULL &&  $this->input->post("merchant_description") != NULL) {
+					$data["merchant_upgrade"] = $this->PaymentsModel->upgrade($this->session->userdata('user_id'), $this->input->post("merchant_name"), $this->input->post("merchant_description"));
+				} else {
+					$data['merchant_upgrade']["status"] = "error";
+					$data['merchant_upgrade']["error"] = "Both Merchant Name and Merchant Description Fields are required.";
+				}
+			}
+			$data['user'] = $this->PaymentsModel->getUserInformation($this->session->userdata("user_id"));
+			$this->load->view("view", $data);
+		} else {
+			redirect($data['url']."user", "refresh");
 		}
 	}
 	public function update($master_key = "nothing") {
