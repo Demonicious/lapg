@@ -21,9 +21,9 @@ The base currency is EUR, and every other currency shows up after being converte
 ### Current Progress
 1.) Login Implemented<br />
 2.) Merchant Status Upgrade<br />
-3.) Changing of Username, Address, Password, Merchant Info (E-Mail will be done later)
-5.) Generating New API Keys<br />
-6.) Sending and Receiving Payments with your Unique Address
+3.) Changing of Username, Address, Password, Merchant Info (E-Mail will be done later)<br />
+4.) Generating New API Keys<br />
+5.) Sending and Receiving Payments with your Unique Address
 
 ### Whats about to come ?
 1.) Registration<br/>
